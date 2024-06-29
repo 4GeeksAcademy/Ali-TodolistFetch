@@ -35,7 +35,34 @@ export const TodoListFetch = () => {
         return (data)
     }
 
-    /* Funcion para crear */
+    /* Funcion para crear usuario */
+    const createUser = async (event) => {
+        const dataToSend = {
+            name: "Ali",
+            id: 8
+        }
+        const uri = `${host}/users/${user}`
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dataToSend)
+        }
+        const response = await fetch(uri, options)
+        if (!response.ok) {
+            console.log('Error', response.status, response.statusText);
+            return
+        }
+        const data = await response.json()
+        console.log(data);
+
+        setTask(''); /* Deja el valor vacio al momento de enviar el dato */
+        getTodos()  // Hacer regresa nuevamente los valores de (todos)
+
+    }
+
+    /* Funcion para enviar tarea */
     const handleSubmit = async (event) => {
         /* Para las funciones submit crear un evento prevent default para evitar que la pagina se recargue automaticamente  */
         event.preventDefault();
@@ -65,7 +92,7 @@ export const TodoListFetch = () => {
         getTodos()  // Hacer regresa nuevamente los valores de (todos)
 
     }
-    /* Funcion para modificar o actualizar */
+    /* Funcion para modificar o actualizar tarea */
     const changeTaskStatus = async (item) => {
         const uri = `${host}/todos/${item.id}`
         /* Usamos el valor (data) para modificar el task, en este caso el data es (is_done), se alterna el valor buleano del repectivo item usando "!" */
@@ -86,7 +113,7 @@ export const TodoListFetch = () => {
         getTodos();
     }
 
-    /* Funcion para borrar */
+    /* Funcion para borrar tarea */
     const deleteTask = async (item) => {
         const uri = `${host}/todos/${item.id}`
         const options = {
@@ -101,9 +128,9 @@ export const TodoListFetch = () => {
         }
         getTodos()
     }
-    /* Funcion para reiniciar la lista */
+    /* Funcion para reiniciar todo */
     const resetAll = async () => {
-        const uri = `${host}/todos/${user}`;
+        const uri = `${host}/users/${user}`;
         const options = {
             method: 'DELETE'
         }
@@ -151,7 +178,10 @@ export const TodoListFetch = () => {
                             </div>
                         </li>)
                     }
-                    <div className="mt-2"><button onClick={resetAll} type="button" className="btn btn-danger">RESET ALL</button></div>
+                    <div className="mt-2 d-flex justify-content-center">
+                        <button onClick={() => createUser(user)} type="button" className="btn btn-success">CREATE USER</button>
+                        <button onClick={() => resetAll(user)} type="button" className="btn btn-danger mx-2">RESET ALL</button>
+                    </div>
                 </ul>
             }
         </div>
