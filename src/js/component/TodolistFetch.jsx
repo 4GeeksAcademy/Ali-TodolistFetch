@@ -5,12 +5,12 @@ export const TodoListFetch = () => {
     const host = 'https://playground.4geeks.com/todo'
     const [todos, setTodos] = useState([]);
     const [task, setTask] = useState('')
-    const user = 'Ali'
+    const [user, setUser] = useState(false)
 
     /*2- se define la funcion asyncrona para consumir la API */
     const getTodos = async () => {
         /* 3- Se define la uri del fetch() */
-        const uri = `${host}/users/${user}`;
+        const uri = `${host}/users/ali`;
         /* 4- Se define la opcion del fetch() */
         const options = {
             method: 'GET'
@@ -37,27 +37,28 @@ export const TodoListFetch = () => {
 
     /* Funcion para crear usuario */
     const createUser = async (event) => {
-        const dataToSend = {
-            name: "Ali",
-            id: 8
-        }
-        const uri = `${host}/users/${user}`
+      
+        
+        const uri = `${host}/users/ali`
         const options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(dataToSend)
+
         }
         const response = await fetch(uri, options)
         if (!response.ok) {
             console.log('Error', response.status, response.statusText);
+            setUser(true)
+            getTodos()
             return
         }
         const data = await response.json()
         console.log(data);
 
         setTask(''); /* Deja el valor vacio al momento de enviar el dato */
+        setUser(true)
         getTodos()  // Hacer regresa nuevamente los valores de (todos)
 
     }
@@ -72,7 +73,7 @@ export const TodoListFetch = () => {
             label: task,
             is_done: false
         }
-        const uri = `${host}/todos/${user}`
+        const uri = `${host}/todos/ali`
         const options = {
             method: 'POST',
             headers: {
@@ -93,16 +94,22 @@ export const TodoListFetch = () => {
 
     }
     /* Funcion para modificar o actualizar tarea */
-    const changeTaskStatus = async (item) => {
+    const changeTask = async (item) => {
         const uri = `${host}/todos/${item.id}`
         /* Usamos el valor (data) para modificar el task, en este caso el data es (is_done), se alterna el valor buleano del repectivo item usando "!" */
-        const taskStatus = { ...item, is_done: !item.is_done };
+        /*  const taskStatus = { ...item, is_done: !item.is_done }; */
+        const dataToSend = {
+            label: task,
+            is_done: true,
+        }
+
+
         const options = {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(taskStatus)
+            body: JSON.stringify(dataToSend)
         }
         const response = await fetch(uri, options)
         console.log(response);
@@ -110,6 +117,8 @@ export const TodoListFetch = () => {
             console.log('Error: ', response.status, response.statusText);
             return
         }
+        const data = await response.json()
+        console.log(data);
         getTodos();
     }
 
@@ -130,7 +139,7 @@ export const TodoListFetch = () => {
     }
     /* Funcion para reiniciar todo */
     const resetAll = async () => {
-        const uri = `${host}/users/${user}`;
+        const uri = `${host}/users/ali`;
         const options = {
             method: 'DELETE'
         }
@@ -157,9 +166,13 @@ export const TodoListFetch = () => {
                     value={task}
                     onChange={(event) => setTask(event.target.value)} />
             </form>
-            {!todos ?
-                <div class="spinner-border text-secondary mt-3" role="status">
-                    <span class="sr-only">Loading...</span>
+            {!user ?
+                <div className=" text-secondary mt-3" role="status">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                    <h3>LETS GO LAZZY!!!!</h3>
+                    <button onClick={() => createUser(user)} type="button" className="btn btn-success">PRESS TO START</button>
                 </div>
                 :
                 <ul className="list-group">
@@ -169,7 +182,7 @@ export const TodoListFetch = () => {
                                 {item.label} {item.is_done ? <i className="fas fa-check text-success"></i> : ""}
                             </div>
                             <div>
-                                <span onClick={() => changeTaskStatus(item)}>
+                                <span onClick={() => changeTask(item)}>
                                     <i className="fas fa-edit btn btn-dark me-3 "></i>
                                 </span>
                                 <span onClick={() => deleteTask(item)}>
@@ -179,7 +192,6 @@ export const TodoListFetch = () => {
                         </li>)
                     }
                     <div className="mt-2 d-flex justify-content-center">
-                        <button onClick={() => createUser(user)} type="button" className="btn btn-success">CREATE USER</button>
                         <button onClick={() => resetAll(user)} type="button" className="btn btn-danger mx-2">RESET ALL</button>
                     </div>
                 </ul>
